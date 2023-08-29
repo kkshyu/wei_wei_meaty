@@ -43,9 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { VueFinalModal } from 'vue-final-modal'
-import { onMounted, ref } from 'vue'
 import { useSupabaseStore } from '@/stores/supabase'
+import { ref } from 'vue'
+import { VueFinalModal } from 'vue-final-modal'
 
 const orderProducts = ref<OrderProduct[]>([])
 const { supabase } = useSupabaseStore()
@@ -65,35 +65,6 @@ const fetchOrderProducts = () => {
       } else {
         orderProducts.value = data as OrderProduct[]
       }
-    })
-}
-
-const submitOrder = () => {
-  supabase
-    .from('order_product')
-    .update({ ordered_at: new Date() })
-    .in(
-      'id',
-      orderProducts.value
-        .filter((orderProduct) => !orderProduct.ordered_at)
-        .map((orderProduct) => orderProduct.id)
-    )
-    .then(({ data, error }) => {
-      if (error) {
-        alert(`無法更新訂單產品資料：${error.message}`)
-      } else {
-        fetchOrderProducts()
-      }
-    })
-}
-
-const removeOrderProduct = (orderProductId: number) => {
-  supabase
-    .from('order_product')
-    .delete()
-    .match({ id: orderProductId })
-    .then(() => {
-      fetchOrderProducts()
     })
 }
 </script>

@@ -65,10 +65,11 @@ supabase
   .select()
   .eq('id', route.params.id)
   .then(({ data }) => {
-    if (data?.[0]) {
-      order.value = data?.[0] as Order
-    } else {
+    order.value = data?.[0]
+    if (!order.value) {
       router.push('/not-found')
+    } else if (order.value.paid_at) {
+      router.push('/paid')
     }
   })
 
