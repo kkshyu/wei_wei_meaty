@@ -76,6 +76,7 @@ supabase
 supabase
   .from('product')
   .select()
+  .order('id')
   .then(({ data }) => {
     products.value = data as Product[]
   })
