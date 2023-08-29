@@ -1,9 +1,9 @@
 <template>
   <VueFinalModal
     class="flex justify-center items-center"
-    content-class="flex flex-col max-w-xl mx-4 bg-white rounded-lg space-y-2"
+    content-class="flex flex-col w-4/5 max-w-xl mx-4 bg-white rounded-lg space-y-2"
   >
-    <div class="image-container">
+    <div v-if="pictureUrl" class="image-container">
       <img :src="pictureUrl" class="aspect-ratio-2-1" />
     </div>
     <div class="p-4">
@@ -17,7 +17,7 @@
           })
         }}</span>
       </h1>
-      <p class="mb-3 h-24 overflow-auto">
+      <p class="mb-3 max-h-24 overflow-auto">
         <slot />
       </p>
       <button
