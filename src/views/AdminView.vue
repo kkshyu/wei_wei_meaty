@@ -23,15 +23,6 @@
             <div>{{ dayjs(order.created_at).format('YYYY/MM/DD') }}</div>
           </small>
         </div>
-        <button
-          v-if="
-            !order.paid_at && !order.orderProducts.some((orderProduct) => !orderProduct.completed_at)
-          "
-          @click="() => vfm.open(order.id)"
-          class="border rounded p-3 bg-black text-white"
-        >
-          結帳
-        </button>
       </div>
       <div class="mb-3">
         <!-- map order products checkbox -->
@@ -59,9 +50,10 @@
           </label>
         </div>
       </div>
-      <div v-if="order.paid_at" class="flex justify-between">
-        <span>{{ order.paid_by == 'cash' ? '現金' : 'Line Pay' }}</span>
-        <span>
+      <div class="flex justify-between">
+        <button @click="() => deleteOrder(order.id)" class="text-red-500 text-link py-1">刪除</button>
+        <span v-if="order.paid_at">
+          {{ order.paid_by == 'cash' ? '現金' : 'Line Pay' }}
           {{
             getOrderPrice(order.id).toLocaleString('zh-TW', {
               style: 'currency',
@@ -70,6 +62,16 @@
             })
           }}
         </span>
+        <button
+          v-else-if="
+            !order.paid_at &&
+            !order.orderProducts.some((orderProduct) => !orderProduct.completed_at)
+          "
+          @click="() => vfm.open(order.id)"
+          class="border rounded bg-black text-white px-3"
+        >
+          結帳
+        </button>
       </div>
     </div>
   </div>
@@ -149,6 +151,35 @@ const payOrder = (orderId: number, paidBy: 'cash' | 'line') => {
       }
       vfm.close(orderId)
     })
+}
+
+const deleteOrder = (orderId: number) => {
+  if (confirm('確定要刪除訂單嗎？此動作無法復原。')) {
+    supabase
+      .from('order_product')
+      .delete()
+      .match({ order_id: orderId })
+      .then(({ data, error }) => {
+        if (error) {
+          alert(`無法刪除訂單產品：${error.message}`)
+        } else {
+          fetchOrders()
+        }
+      })
+      .then(() => {
+        supabase
+          .from('order')
+          .delete()
+          .match({ id: orderId })
+          .then(({ data, error }) => {
+            if (error) {
+              alert(`無法刪除訂單：${error.message}`)
+            } else {
+              fetchOrders()
+            }
+          })
+      })
+  }
 }
 
 // set interval to fetch orders while mounted, and remove interval while unmounted

@@ -82,7 +82,7 @@ supabase
   })
 
 const submitOrder = (productId: number) => {
-  if (confirm('確定要點餐嗎？')) {
+  if (confirm('確定要送出嗎？送出後將會開始製作餐點。')) {
     supabase
       .from('order_product')
       .insert({
